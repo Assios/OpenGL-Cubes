@@ -9,7 +9,7 @@ void draw1(int a, int b);
 void init(void) {
 	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat mat_shininess[] = { 50.0 };
-	GLfloat light_position[] = { 0.1, 1.0, 0.0, 0.0 };
+	GLfloat light_position[] = { 0.2, 1.0, 0.0, 0.0 };
 	glClearColor(0.5, 0.1, 0.2, 0.3);
 	glShadeModel(GL_FLAT);
 
