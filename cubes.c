@@ -10,7 +10,7 @@ void init(void) {
 }
 
 float angle = 0.0;
-
+float trans = 0.0;
 
 void rotate(int a) {
         angle += 1.0f;
@@ -23,7 +23,10 @@ void rotate(int a) {
 }
 
 void move(int a) {
-	
+	trans += 0.01f;
+
+	glutPostRedisplay();
+	glutTimerFunc(25, move, a);
 }
 
 void drawCube(float size, int direction) {
@@ -76,18 +79,35 @@ void drawCube(float size, int direction) {
 }
 
 //DRAW NUMBERS
-void draw1(int size) {
+
+void draw0(int size, int type) {
+	if (type == 0)
+		//To not change color when it's the number 10
+		glColor3f (0.8, 1.0, 0.1);
+
+	glPushMatrix();
+	glTranslatef(-trans, 0.0, 0.0);
+	glScalef(1.0, 2.0, 1.0);
+	glutSolidTorus(0.05, 0.2, 50, 50);
+	glPopMatrix();
+}
+
+void draw1(int size, int type) {
+	if (type == 0)
+		//To not change color when it's the number 10
+		glColor3f(1.0, 0.0, 0.2);
+	glTranslatef(trans, 0.0, 0.0);
 	glPushMatrix();
 	glScalef(0.8, 0.8, 0.8);
 	glRotatef(90.0, 0.0, 0.0, 1.0);
-	glTranslatef(-0.1, -0.18, 0.9);
+	glTranslatef(-0.1, -0.18, 0.0);
 	glScalef(0.8, 0.03, 0.03);
 	drawCube(size, 9);
 	glPopMatrix();
 
 	glPushMatrix();
 	glScalef(0.8, 0.8, 0.8);
-	glTranslatef(0.1, 0.2, 0.9);
+	glTranslatef(0.1, 0.2, 0.0);
 	glRotatef(60.0, 0.0, 0.0, 1.0);
 	glScalef(0.2, 0.03, 0.03);
 	drawCube(size, 9);
@@ -96,12 +116,19 @@ void draw1(int size) {
 
 void draw4(int size) {
 	glPushMatrix();
+	glColor3f (1.0, 0.0, 0.6);
+	glTranslatef(trans, 0.0, 0.0);
+
+	glPushMatrix();
 	glScalef(0.8, 0.8, 0.8);
 
 	glTranslatef(0.0, 1.0, 0.0);
+
 	glPushMatrix();
-	glScalef(0.6, 0.03, 0.03);
-	drawCube(size, 5);
+	glRotatef(180.0, 0.0, 0.0, 1.0);
+	glTranslatef(-0.05, 0.2, 0.9);
+	glScalef(0.5, 0.03, 0.03);
+	drawCube(size, 9);
 	glPopMatrix();
 
 	glPushMatrix();
@@ -116,6 +143,7 @@ void draw4(int size) {
 	glTranslatef(-0.2, -0.18, 0.9);
 	glScalef(0.8, 0.03, 0.03);
 	drawCube(size, 9);
+	glPopMatrix();
 	glPopMatrix();
 	glPopMatrix();
 }
@@ -138,10 +166,26 @@ void draw7(int size) {
 }
 
 void draw8(int size) {
+	glColor3f (0.2, 1.0, 0.1);
+
+	glPushMatrix();
+	glTranslatef(trans, 0.0, 0.0);
 	glutSolidTorus(0.05, 0.2, 50, 50);
 	glPushMatrix();
 	glTranslatef(0.0, -0.4, 0.0);
 	glutSolidTorus(0.05, 0.2, 50, 50);
+	glPopMatrix();
+	glPopMatrix();
+}
+
+void draw10(int size) {
+	glColor3f(0.3, 0.7, 0.2);
+	glPushMatrix();
+	glPushMatrix();
+	glTranslatef(-2, 0.0, 0.0);
+	draw1(1, 1);
+	draw0(1, 1);
+	glPopMatrix();
 	glPopMatrix();
 }
 
@@ -155,7 +199,7 @@ void display() {
 
 	glScalef (1.0, 1.0, 1.0);
 
-	glColor3f (0.0, 1.0, 0.6);
+	glColor3f (0.0, 0.8, 0.8);
 
 	for (int i = 0; i < 5; i++) {
 		glPushMatrix();
@@ -167,18 +211,26 @@ void display() {
 		glPopMatrix();
 	}
 
-	draw4(1);
+	//Draw 0
+	glPushMatrix();
+	glTranslatef(3.0, -1.0, 0.0);
+	draw0(1, 0);
+	glPopMatrix();
 
 	//Draw 1
 	glPushMatrix();
-	glTranslatef(-1.0, 1.0, 0.0);
-	draw1(1);
+	glTranslatef(-3.0, 1.0, 0.0);
+	draw1(1, 0);
+	glPopMatrix();
+
+	glPushMatrix();
+	glTranslatef(-3.5, 1.0, 0.0);
+	draw4(1);
 	glPopMatrix();
 
 	//Draw number 8
 	glPushMatrix();
-	glTranslatef(1.0, 1.0, 0.0);
-	glRotatef(angle, 0.0, 1.0, 0.0);
+	glTranslatef(-4.0, 1.0, 0.0);
 	draw8(0.4);
 	glPopMatrix();
 
@@ -206,6 +258,7 @@ int main(int argc, char** argv) {
 	glutReshapeFunc(reshape);
 
 	glutTimerFunc(25, rotate, 0);
+	glutTimerFunc(25, move, 0);
 
 	glutMainLoop();
 	return 0;
