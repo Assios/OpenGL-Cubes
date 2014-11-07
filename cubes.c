@@ -4,9 +4,23 @@
 #include <stdio.h>
 #include <time.h>
 
+void draw1(int a, int b);
+
 void init(void) {
-	glClearColor(0.2, 0.1, 0.2, 0.1);
+	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+	GLfloat mat_shininess[] = { 50.0 };
+	GLfloat light_position[] = { 0.1, 1.0, 0.0, 0.0 };
+	glClearColor(0.5, 0.1, 0.2, 0.3);
 	glShadeModel(GL_FLAT);
+
+    glMaterialfv(GL_FRONT, GL_SPECULAR, mat_specular);
+    glMaterialfv(GL_FRONT, GL_SHININESS, mat_shininess);
+    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_LIGHT0);
+    glEnable(GL_DEPTH_TEST);
 }
 
 float angle = 0.0;
@@ -118,6 +132,7 @@ void draw4(int size) {
 	glPushMatrix();
 	glColor3f (1.0, 0.0, 0.6);
 	glTranslatef(trans, 0.0, 0.0);
+	glRotatef(angle, 0.0, 1.0, 0.0);
 
 	glPushMatrix();
 	glScalef(0.8, 0.8, 0.8);
@@ -169,7 +184,9 @@ void draw8(int size) {
 	glColor3f (0.2, 1.0, 0.1);
 
 	glPushMatrix();
+
 	glTranslatef(trans, 0.0, 0.0);
+	glRotatef(angle, 0.0, 1.0, 0.0);
 	glutSolidTorus(0.05, 0.2, 50, 50);
 	glPushMatrix();
 	glTranslatef(0.0, -0.4, 0.0);
@@ -190,7 +207,7 @@ void draw10(int size) {
 }
 
 void display() {
-	glClear (GL_COLOR_BUFFER_BIT);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glLoadIdentity ();
 
 	gluLookAt (0.0, 0.0, 4.0,
