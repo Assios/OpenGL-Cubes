@@ -1,4 +1,4 @@
 CS180
 =====
 
-Cubes
+Some graphics made with OpenGL for the course CS180.
