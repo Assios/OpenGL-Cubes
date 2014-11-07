@@ -25,6 +25,7 @@ void init(void) {
 
 float angle = 0.0;
 float trans = 0.0;
+int timer = 0;
 
 void rotate(int a) {
         angle += 1.0f;
@@ -37,7 +38,10 @@ void rotate(int a) {
 }
 
 void move(int a) {
-	trans += 0.01f;
+	if (timer < 350) {
+		trans += 0.01f;
+		timer++;
+	}
 
 	glutPostRedisplay();
 	glutTimerFunc(25, move, a);
@@ -93,17 +97,25 @@ void drawCube(float size, int direction) {
 }
 
 //DRAW NUMBERS
-
+float y = 0.00;
 void draw0(int size, int type) {
 	if (type == 0)
 		//To not change color when it's the number 10
 		glColor3f (0.8, 1.0, 0.1);
 
 	glPushMatrix();
-	glTranslatef(-trans, 0.0, 0.0);
+	glTranslatef(-trans, y, 0.0);
 	glScalef(1.0, 2.0, 1.0);
 	glutSolidTorus(0.05, 0.2, 50, 50);
 	glPopMatrix();
+	if (timer < 100)
+		y = y+0.002;
+	else if (timer < 200)
+		y = y-0.002;
+	else if (timer < 300)
+		y = y+0.002;
+	else if (timer < 350)
+		y = y-0.002;
 }
 
 void draw1(int size, int type) {
@@ -132,7 +144,10 @@ void draw4(int size) {
 	glPushMatrix();
 	glColor3f (1.0, 0.0, 0.6);
 	glTranslatef(trans, 0.0, 0.0);
-	glRotatef(angle, 0.0, 1.0, 0.0);
+	if (timer < 350)
+		glRotatef(angle, 0.0, 1.0, 0.0);
+	else
+		glRotatef(-10, 0.0, 1.0, 0.0);
 
 	glPushMatrix();
 	glScalef(0.8, 0.8, 0.8);
@@ -186,7 +201,8 @@ void draw8(int size) {
 	glPushMatrix();
 
 	glTranslatef(trans, 0.0, 0.0);
-	glRotatef(angle, 0.0, 1.0, 0.0);
+	if (timer < 350)
+		glRotatef(angle, 0.0, 1.0, 0.0);
 	glutSolidTorus(0.05, 0.2, 50, 50);
 	glPushMatrix();
 	glTranslatef(0.0, -0.4, 0.0);
