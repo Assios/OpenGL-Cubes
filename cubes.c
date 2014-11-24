@@ -26,6 +26,20 @@ void init(void) {
 float angle = 0.0;
 float trans = 0.0;
 int timer = 0;
+float x_rotate = 0.0;
+float y_rotate = 0.0;
+
+int xpos;
+int ypos;
+int prevxpos;
+int prevypos;
+
+void mouse(int x, int y) {
+	xpos = x;
+	ypos = y;
+
+	glutPostRedisplay();
+}
 
 void rotate(int a) {
         angle += 1.0f;
@@ -232,7 +246,11 @@ void display() {
 
 	glScalef (1.0, 1.0, 1.0);
 
-	glColor3f (0.0, 0.8, 0.8);
+
+	//FOR ROTATING SCREEN
+	glRotatef(xpos, 0.0f, 1.0, 0.0f);
+
+	glRotatef(ypos, 1.0f, 0.0, 0.0f);
 
 	for (int i = 0; i < 5; i++) {
 		glPushMatrix();
@@ -277,9 +295,12 @@ void reshape (int w, int h)
 	glLoadIdentity ();
 	glFrustum (-1.0, 1.0, -1.0, 1.0, 1.5, 20.0);
 	glMatrixMode (GL_MODELVIEW);
+
 }
 
+
 int main(int argc, char** argv) {
+
 	glutInit(&argc, argv);
 	glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize (600, 600);
@@ -288,10 +309,13 @@ int main(int argc, char** argv) {
 	init ();
 	glutDisplayFunc(display);
 
+
 	glutReshapeFunc(reshape);
 
 	glutTimerFunc(25, rotate, 0);
 	glutTimerFunc(25, move, 0);
+
+	glutPassiveMotionFunc(mouse);
 
 	glutMainLoop();
 	return 0;
