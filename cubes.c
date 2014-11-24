@@ -3,10 +3,50 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
+#include <GL/gl.h>
 
-void draw1(int a, int b);
+float angle = 0.0;
+float trans = 0.0;
+int timer = 0;
+float x_rotate = 0.0;
+float y_rotate = 0.0;
+GLuint id;
+
+int xpos, ypos;
+
+const GLuint load_texture(const char *path){
+	//For loading the bitmap
+	FILE *file = fopen(path, "rb");
+	char head[54], *data;
+	int w, h, size;
+	fread(head, 1, 54, file);
+	int pos = 54;
+
+	size = *(int*)&(head[0x22]);
+	w = *(int*)&(head[0x12]);
+	h = *(int*)&(head[0x16]);
+	
+	if (size==0) {
+		size = w*h*3;
+	}
+
+	data = malloc(size);
+
+	fread(data, sizeof(char), size, file);
+	fclose(file);
+
+	GLuint ID;
+	glGenTextures(1, &ID);
+	glBindTexture(GL_TEXTURE_2D, ID);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0,GL_RGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, data);
+	free(data);
+	return ID;
+}
 
 void init(void) {
+	id = load_texture("wood.bmp");
 	GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 	GLfloat mat_shininess[] = { 50.0 };
 	GLfloat light_position[] = { 0.2, 1.0, 0.0, 0.0 };
@@ -22,17 +62,6 @@ void init(void) {
     glEnable(GL_LIGHT0);
     glEnable(GL_DEPTH_TEST);
 }
-
-float angle = 0.0;
-float trans = 0.0;
-int timer = 0;
-float x_rotate = 0.0;
-float y_rotate = 0.0;
-
-int xpos;
-int ypos;
-int prevxpos;
-int prevypos;
 
 void mouse(int x, int y) {
 	xpos = x;
@@ -62,6 +91,9 @@ void move(int a) {
 }
 
 void drawCube(float size, int direction) {
+	glEnable(GL_TEXTURE_2D);
+	glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+	glBindTexture(GL_TEXTURE_2D, id);
 	glPushMatrix();
     glTranslatef(0.5, 1.0, 0.0);
     glPopMatrix();
@@ -72,42 +104,44 @@ void drawCube(float size, int direction) {
     	glRotatef(-angle, 0.0, 1.0, 0.0);
 
 	glBegin(GL_QUADS);
-		glNormal3f(0.0f, size, 0.0f);	
-		glVertex3f(-0.5*size, 0.5*size, 0.5*size);
-		glVertex3f(0.5*size, 0.5*size, 0.5*size);
-		glVertex3f(0.5*size, 0.5*size, -0.5*size);
-		glVertex3f(-0.5*size, 0.5*size, -0.5*size);
+		glNormal3f(0.0f, size, 0.0f);
+		glTexCoord2f(0.0,0.0); glVertex3f(-0.5*size, 0.5*size, 0.5*size);
+		glTexCoord2f(0.0,1.0); glVertex3f(0.5*size, 0.5*size, 0.5*size);
+		glTexCoord2f(1.0,1.0); glVertex3f(0.5*size, 0.5*size, -0.5*size);
+		glTexCoord2f(1.0,0.0); glVertex3f(-0.5*size, 0.5*size, -0.5*size);
 	 
 		glNormal3f(0.0f, 0.0f, 1.0*size);
-		glVertex3f(0.5*size, -0.5*size, 0.5*size);
-		glVertex3f(0.5*size, 0.5*size, 0.5*size);
-		glVertex3f(-0.5*size, 0.5*size, 0.5*size);
-		glVertex3f(-0.5*size, -0.5*size, 0.5*size);
+		glTexCoord2f(0.0,0.0); glVertex3f(0.5*size, -0.5*size, 0.5*size);
+		glTexCoord2f(0.0,1.0); glVertex3f(0.5*size, 0.5*size, 0.5*size);
+		glTexCoord2f(1.0,1.0); glVertex3f(-0.5*size, 0.5*size, 0.5*size);
+		glTexCoord2f(1.0,0.0); glVertex3f(-0.5*size, -0.5*size, 0.5*size);
 
 		glNormal3f(1.0*size, 0.0f, 0.0f);
-		glVertex3f(0.5*size, 0.5*size, -0.5*size);
-		glVertex3f(0.5*size, 0.5*size, 0.5*size);
-		glVertex3f(0.5*size, -0.5*size, 0.5*size);
-		glVertex3f(0.5*size, -0.5*size, -0.5*size);
+		glTexCoord2f(0.0,0.0); glVertex3f(0.5*size, 0.5*size, -0.5*size);
+		glTexCoord2f(0.0,1.0); glVertex3f(0.5*size, 0.5*size, 0.5*size);
+		glTexCoord2f(1.0,1.0); glVertex3f(0.5*size, -0.5*size, 0.5*size);
+		glTexCoord2f(1.0,0.0); glVertex3f(0.5*size, -0.5*size, -0.5*size);
 	 
 		glNormal3f(-1.0*size, 0.0f, 0.0f);
-		glVertex3f(-0.5*size, -0.5*size, 0.5*size);
-		glVertex3f(-0.5*size, 0.5*size, 0.5*size);
-		glVertex3f(-0.5*size, 0.5*size, -0.5*size);
-		glVertex3f(-0.5*size, -0.5*size, -0.5*size);
+		glTexCoord2f(0.0,0.0); glVertex3f(-0.5*size, -0.5*size, 0.5*size);
+		glTexCoord2f(0.0,1.0); glVertex3f(-0.5*size, 0.5*size, 0.5*size);
+		glTexCoord2f(1.0,1.0); glVertex3f(-0.5*size, 0.5*size, -0.5*size);
+		glTexCoord2f(1.0,0.0); glVertex3f(-0.5*size, -0.5*size, -0.5*size);
 	 
 		glNormal3f(0.0f, -1.0*size, 0.0f);
-		glVertex3f(0.5*size, -0.5*size, 0.5*size);
-		glVertex3f(-0.5*size, -0.5*size, 0.5*size);
-		glVertex3f(-0.5*size, -0.5*size, -0.5*size);
-		glVertex3f(0.5*size, -0.5*size, -0.5*size);
+		glTexCoord2f(0.0,0.0); glVertex3f(0.5*size, -0.5*size, 0.5*size);
+		glTexCoord2f(0.0,1.0); glVertex3f(-0.5*size, -0.5*size, 0.5*size);
+		glTexCoord2f(1.0,1.0); glVertex3f(-0.5*size, -0.5*size, -0.5*size);
+		glTexCoord2f(1.0,0.0); glVertex3f(0.5*size, -0.5*size, -0.5*size);
 
 		glNormal3f(0.0f, 0.0f, -1.0*size);
-		glVertex3f(0.5*size, 0.5*size, -0.5*size);
-		glVertex3f(0.5*size, -0.5*size, -0.5*size);
-		glVertex3f(-0.5*size, -0.5*size, -0.5*size);
-		glVertex3f(-0.5*size, 0.5*size, -0.5*size); 
+		glTexCoord2f(0.0,0.0); glVertex3f(0.5*size, 0.5*size, -0.5*size);
+		glTexCoord2f(0.0,1.0); glVertex3f(0.5*size, -0.5*size, -0.5*size);
+		glTexCoord2f(1.0,1.0); glVertex3f(-0.5*size, -0.5*size, -0.5*size);
+		glTexCoord2f(1.0,0.0); glVertex3f(-0.5*size, 0.5*size, -0.5*size); 
 	glEnd();
+
+	glDisable(GL_TEXTURE_2D);
 }
 
 //DRAW NUMBERS
@@ -251,6 +285,9 @@ void display() {
 	glRotatef(xpos, 0.0f, 1.0, 0.0f);
 
 	glRotatef(ypos, 1.0f, 0.0, 0.0f);
+
+	glColor3f (1.0, 1.0, 1.0);
+
 
 	for (int i = 0; i < 5; i++) {
 		glPushMatrix();
